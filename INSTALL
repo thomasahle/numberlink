@@ -1,0 +1,7 @@
+To build and run numberlink, you can execute the following,
+starting in the project root directory:
+
+$ export GOPATH=`pwd`
+$ go install numberlink # This 'installs' in the bin and pkg folders
+$ go test numberlink
+$ go bin/numberlink
