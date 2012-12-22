@@ -5,3 +5,15 @@ $ export GOPATH=`pwd`
 $ go install numberlink # This 'installs' in the bin and pkg folders
 $ go test numberlink
 $ go bin/numberlink
+
+
+If you don't have Go, you can download it for Linux, FreeBSD,
+OSX or Windows from:
+
+  https://code.google.com/p/go/downloads/list
+
+On Ubuntu you may run
+
+$ sudo add-apt-repository ppa:gophers/go
+$ sudo apt-get update
+$ sudo apt-get install golang-stable # Or golang-weekly, or golang-tip

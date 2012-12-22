@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 type ParseError struct {
-	Line int
+	Line    int
 	Problem string
 }
 

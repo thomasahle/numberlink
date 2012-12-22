@@ -1,22 +1,22 @@
 package main
 
 const (
-	GRASS  = '#'
-	EMPTY  = '.'
+	GRASS = '#'
+	EMPTY = '.'
 )
 
 const (
-	N    = 1
-	E    = 2
-	S    = 4
-	W    = 8
+	N = 1
+	E = 2
+	S = 4
+	W = 8
 )
 
 var (
 	// Array for iterating over simple directions
 	DIRS = [4]int{N, E, S, W}
 	// Mirrors directions so W becomes E and SE becomes NW
-	MIR  = [16]int{0, S, W, S | W, N, N | S, N | W, N | S | W, E, E | S, E | W, E | S | W, N | E, N | E | S, N | E | W, N | E | S | W}
+	MIR = [16]int{0, S, W, S | W, N, N | S, N | W, N | S | W, E, E | S, E | W, E | S | W, N | E, N | E | S, N | E | W, N | E | S | W}
 )
 
 type Paper struct {
@@ -72,9 +72,10 @@ func NewPaper(width, height int, table []rune) *Paper {
 	return paper
 }
 
-var calls = 0
+var Calls = 0
+
 func solve(paper *Paper, pos int) bool {
-	calls++
+	Calls++
 
 	// Final
 	if pos == (paper.Height-1)*paper.Width-2 {
@@ -180,7 +181,7 @@ func (paper *Paper) setnrem(ptr []int, key, val int) {
 }
 
 func (paper *Paper) goBack(histSize int) {
-	for i := len(paper.hist)-1; i >= histSize; i-- {
+	for i := len(paper.hist) - 1; i >= histSize; i-- {
 		entry := paper.hist[i]
 		entry.ptr[entry.key] = entry.val
 	}
@@ -285,7 +286,7 @@ func initTables(paper *Paper) {
 	for pos := 0; pos < w*h; pos++ {
 		paper.end[pos] = pos
 	}
-  
+
 	// Connection table
 	paper.Con = make([]int, w*h)
 }

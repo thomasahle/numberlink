@@ -19,7 +19,6 @@ const (
 
 var (
 	TUBE = [16]rune{' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼'}
-	SIGMA = [62]rune{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
 )
 
 func PrintSimple(paper *Paper, color bool) {
@@ -28,7 +27,7 @@ func PrintSimple(paper *Paper, color bool) {
 	fmt.Println(paper.Width-2, paper.Height-2)
 	for y := 1; y < paper.Height-1; y++ {
 		for x := 1; x < paper.Width-1; x++ {
-			pos := y*paper.Width+x
+			pos := y*paper.Width + x
 			if col := colors[pos]; col == "" {
 				fmt.Printf("%c", table[pos])
 			} else {
@@ -43,7 +42,7 @@ func PrintTubes(paper *Paper, color bool) {
 	colors := makeColorTable(paper, !color)
 	for y := 1; y < paper.Height-1; y++ {
 		for x := 1; x < paper.Width-1; x++ {
-			pos := y*paper.Width+x
+			pos := y*paper.Width + x
 			val := paper.Table[pos]
 			var c rune
 			if val == EMPTY {
@@ -104,7 +103,7 @@ func fillTable(paper *Paper) []rune {
 				paint := table[pos]
 				for _, dir := range DIRS {
 					next := pos + paper.Vctr[dir]
-					if paper.Con[pos] & dir != 0 && table[next] == EMPTY {
+					if paper.Con[pos]&dir != 0 && table[next] == EMPTY {
 						table[next] = paint
 						queue.PushBack(next)
 					}
