@@ -3,6 +3,7 @@ package main
 import "fmt"
 import "math/rand"
 import "os"
+import "time"
 
 var (
 	SIGMA  = [62]int{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
@@ -33,6 +34,7 @@ func Generate(width, height int) error {
 	if width == 0 || height == 0 || width == 1 && height == 1 {
 		return fmt.Errorf("Error: Requires bigger paper size")
 	}
+	rand.Seed(time.Now().UTC().UnixNano())
 	table := tile(width, height)
 	shuffle(table)
 	oddCorner(table)
@@ -208,7 +210,7 @@ func layFlow(x, y int, table [][]int) {
 
 func follow(x, y, x0, y0 int, table [][]int) (int, int) {
 	width, height := len(table[0]), len(table)
-	for i := 0; i < 4; i++ {
+	for _, i := range rand.Perm(4) {
 		x1, y1 := x+DX[i], y+DY[i]
 		if inside(x1, y1, width, height) && !(x1 == x0 && y1 == y0) &&
 			table[y][x] == table[y1][x1] {
