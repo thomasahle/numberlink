@@ -176,6 +176,36 @@ func chooseConnections(paper *Paper, pos int) bool {
 // As it turns out, our smart algorithm isn't 100% able to avoid self-touching flows
 // Hence we need this validation to filter out the false positives
 func (paper *Paper) validate() bool {
+	w, h := paper.Width, paper.Height
+	vtable := make([]rune, w*h)
+	for pos := 0; pos < w*h; pos++ {
+		if paper.source[pos] {
+			// Run throw the flow
+			alpha := paper.Table[pos]
+			old, next := pos, pos
+			for {
+				// Mark our path as we go
+				vtable[pos] = alpha
+				for _, dir := range DIRS {
+					cand := pos + paper.Vctr[dir]
+					if paper.Con[pos] & dir != 0 {
+						if cand != old {
+							next = cand
+						}
+					} else if vtable[cand] == alpha && !paper.source[cand] {
+						// We aren't connected, but it has our color,
+						// this is exactly what we doesn't want.
+						return false
+					}
+				}
+				// We have reached the end
+				if old != pos && paper.source[pos] {
+					break
+				}
+				old, pos = pos, next
+			}
+		}
+	}
 	return true
 }
 

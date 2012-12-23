@@ -60,6 +60,7 @@ func PrintTubes(paper *Paper, color bool) {
 	}
 }
 
+// Assigns a terminal color code to every position on the paper
 func makeColorTable(paper *Paper, empty bool) []string {
 	color := make([]string, paper.Width*paper.Height)
 	if !empty {
@@ -70,7 +71,7 @@ func makeColorTable(paper *Paper, empty bool) []string {
 		for _, c := range available {
 			available = append(available, BOLD+c)
 		}
-		var mapping = make(map[int32]string)
+		var mapping = make(map[rune]string)
 
 		for y := 1; y < paper.Height-1; y++ {
 			for x := 1; x < paper.Width-1; x++ {
@@ -90,6 +91,7 @@ func makeColorTable(paper *Paper, empty bool) []string {
 	return color
 }
 
+// Does a bfs search on every source, filling out its connected nodes
 func fillTable(paper *Paper) []rune {
 	w, h := paper.Width, paper.Height
 	table := make([]rune, w*h)
