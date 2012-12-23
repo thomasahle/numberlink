@@ -188,7 +188,7 @@ func (paper *Paper) validate() bool {
 				vtable[pos] = alpha
 				for _, dir := range DIRS {
 					cand := pos + paper.Vctr[dir]
-					if paper.Con[pos] & dir != 0 {
+					if paper.Con[pos]&dir != 0 {
 						if cand != old {
 							next = cand
 						}

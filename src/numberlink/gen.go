@@ -226,7 +226,7 @@ func inside(x, y int, width, height int) bool {
 
 func flatten(table [][]int) int {
 	width, height := len(table[0]), len(table)
-	MAX := width*height+1
+	MAX := width*height + 1
 	alpha := MAX
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
