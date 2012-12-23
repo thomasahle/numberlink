@@ -4,7 +4,7 @@ starting in the project root directory:
 $ export GOPATH=`pwd`
 $ go install numberlink # This 'installs' in the bin and pkg folders
 $ go test numberlink
-$ go bin/numberlink
+$ bin/numberlink
 
 
 If you don't have Go, you can download it for Linux, FreeBSD,
