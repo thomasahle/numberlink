@@ -79,7 +79,7 @@ func solve(paper *Paper, pos int) bool {
 
 	// Final
 	if pos == (paper.Height-1)*paper.Width-2 {
-		return true
+		return paper.validate()
 	}
 
 	// Connect
@@ -171,6 +171,12 @@ func chooseConnections(paper *Paper, pos int) bool {
 		}
 	}
 	return false
+}
+
+// As it turns out, our smart algorithm isn't 100% able to avoid self-touching flows
+// Hence we need this validation to filter out the false positives
+func (paper *Paper) validate() bool {
+	return true
 }
 
 func (paper *Paper) setnrem(ptr []int, key, val int) {
