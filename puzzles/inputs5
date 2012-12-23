@@ -1,3 +1,5 @@
+# Author of all puzzles in this file: Thomas Ahle
+
 3 2
 A..
 ..A
@@ -16,6 +18,13 @@ a.b
 ba.
 ba.
 ...
+
+4 5
+....
+.ab.
+....
+..b.
+a...
 
 7 3
 .......
