@@ -226,7 +226,11 @@ func inside(x, y int, width, height int) bool {
 
 func flatten(table [][]int) int {
 	width, height := len(table[0]), len(table)
+	// Some number greater than the maximum possible amount
+	// of different values in table
 	MAX := width*height + 1
+	// Flatten all the flows at MAX+iota so we don't
+	// accidentially merge something
 	alpha := MAX
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
@@ -236,14 +240,11 @@ func flatten(table [][]int) int {
 			}
 		}
 	}
-	alpha = 0
+	// Then subtract MAX to get what we actually wanted
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			if table[y][x] >= MAX {
-				fill(x, y, alpha, table)
-				alpha += 1
-			}
+			table[y][x] -= MAX
 		}
 	}
-	return alpha
+	return alpha - MAX
 }
