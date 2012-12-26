@@ -41,10 +41,15 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error: Unable to parse arguments to --generate")
 			os.Exit(1)
 		}
-		err := Generate(width, height)
+		pzzl, _, err := Generate(width, height)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
 			os.Exit(1)
+		} else {
+			fmt.Println(len(pzzl[0]), len(pzzl))
+			for _, line := range pzzl {
+				fmt.Println(line)
+			}
 		}
 		return
 	}

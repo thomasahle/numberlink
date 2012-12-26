@@ -2,14 +2,12 @@ package main
 
 import "fmt"
 import "math/rand"
-import "os"
 import "time"
 
 var (
-	SIGMA  = [62]int{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
-	SIGMA2 = [91]int{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '"', '$', '%', '&', '\\', '(', ')', '*', '+', ',', '-', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~'}
-	DX     = [4]int{0, 1, 0, -1}
-	DY     = [4]int{-1, 0, 1, 0}
+	SIGMA = [92]int{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '"', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'}
+	DX    = [4]int{0, 1, 0, -1}
+	DY    = [4]int{-1, 0, 1, 0}
 )
 
 func square(x int) int {
@@ -30,9 +28,9 @@ func square(x int) int {
 //    which would create puzzles that 'double back on themselves'
 // 5) Before the puzzle is printed we 'compact' the range of colors used, as much as possible
 // 6) The puzzle is printed by replacing all positions that aren't flow-heads with a .
-func Generate(width, height int) error {
+func Generate(width, height int) ([]string, []string, error) {
 	if width == 0 || height == 0 || width == 1 && height == 1 {
-		return fmt.Errorf("Error: Requires bigger paper size")
+		return nil, nil, fmt.Errorf("Error: Requires bigger paper size")
 	}
 	rand.Seed(time.Now().UTC().UnixNano())
 	table := tile(width, height)
@@ -42,29 +40,28 @@ func Generate(width, height int) error {
 	return print(table)
 }
 
-func print(table [][]int) error {
+func print(table [][]int) ([]string, []string, error) {
 	width, height := len(table[0]), len(table)
 	colorsUsed := flatten(table)
-	if colorsUsed > len(SIGMA2) {
-		return fmt.Errorf("Error: Not enough printable characters to print puzzle")
-	} else if colorsUsed > len(SIGMA) {
-		fmt.Fprintf(os.Stderr, "Warning: Including non-standard characters in puzzle\n\n")
+	if colorsUsed > len(SIGMA) {
+		return nil, nil, fmt.Errorf("Error: Not enough printable characters to print puzzle")
 	}
 
-	fmt.Println(width, height)
+	pzzl := make([]string, height)
+	sltn := make([]string, height)
+
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
+			sltn[y] = sltn[y] + string(SIGMA[table[y][x]])
 			if isFlowHead(x, y, table) {
-				fmt.Printf("%c", SIGMA2[table[y][x]])
+				pzzl[y] = pzzl[y] + string(SIGMA[table[y][x]])
 			} else {
-				fmt.Printf(".")
+				pzzl[y] = pzzl[y] + "."
 			}
 		}
-		fmt.Println()
 	}
-	fmt.Println()
 
-	return nil
+	return pzzl, sltn, nil
 }
 
 func tile(width, height int) [][]int {
@@ -137,6 +134,45 @@ func oddCorner(table [][]int) {
 	}
 }
 
+func findFlows(table [][]int) {
+	width, height := len(table[0]), len(table)
+	for i := 0; i < square(width*height); i++ {
+		x, y := rand.Intn(width), rand.Intn(height)
+		if isFlowHead(x, y, table) {
+			layFlow(x, y, table)
+		}
+	}
+}
+
+func isFlowHead(x, y int, table [][]int) bool {
+	width, height := len(table[0]), len(table)
+	degree := 0
+	for i := 0; i < 4; i++ {
+		x1, y1 := x+DX[i], y+DY[i]
+		if inside(x1, y1, width, height) && table[y1][x1] == table[y][x] {
+			degree += 1
+		}
+	}
+	return degree < 2
+}
+
+func inside(x, y int, width, height int) bool {
+	return 0 <= x && x < width && 0 <= y && y < height
+}
+
+func layFlow(x, y int, table [][]int) {
+	width, height := len(table[0]), len(table)
+	for i := 0; i < 4; i++ {
+		x1, y1 := x+DX[i], y+DY[i]
+		if inside(x1, y1, width, height) && canConnect(x, y, x1, y1, table) {
+			fill(x1, y1, table[y][x], table)
+			x2, y2 := follow(x1, y1, x, y, table)
+			layFlow(x2, y2, table)
+			return
+		}
+	}
+}
+
 func canConnect(x1, y1, x2, y2 int, table [][]int) bool {
 	width, height := len(table[0]), len(table)
 	// Check (x1,y2) and (x2,y2) are flow heads
@@ -161,18 +197,6 @@ func canConnect(x1, y1, x2, y2 int, table [][]int) bool {
 	return true
 }
 
-func isFlowHead(x, y int, table [][]int) bool {
-	width, height := len(table[0]), len(table)
-	degree := 0
-	for i := 0; i < 4; i++ {
-		x1, y1 := x+DX[i], y+DY[i]
-		if inside(x1, y1, width, height) && table[y1][x1] == table[y][x] {
-			degree += 1
-		}
-	}
-	return degree < 2
-}
-
 func fill(x, y int, alpha int, table [][]int) {
 	width, height := len(table[0]), len(table)
 	orig := table[y][x]
@@ -181,29 +205,6 @@ func fill(x, y int, alpha int, table [][]int) {
 		x1, y1 := x+DX[i], y+DY[i]
 		if inside(x1, y1, width, height) && table[y1][x1] == orig {
 			fill(x1, y1, alpha, table)
-		}
-	}
-}
-
-func findFlows(table [][]int) {
-	width, height := len(table[0]), len(table)
-	for i := 0; i < square(width*height); i++ {
-		x, y := rand.Intn(width), rand.Intn(height)
-		if isFlowHead(x, y, table) {
-			layFlow(x, y, table)
-		}
-	}
-}
-
-func layFlow(x, y int, table [][]int) {
-	width, height := len(table[0]), len(table)
-	for i := 0; i < 4; i++ {
-		x1, y1 := x+DX[i], y+DY[i]
-		if inside(x1, y1, width, height) && canConnect(x, y, x1, y1, table) {
-			fill(x1, y1, table[y][x], table)
-			x2, y2 := follow(x1, y1, x, y, table)
-			layFlow(x2, y2, table)
-			return
 		}
 	}
 }
@@ -220,15 +221,14 @@ func follow(x, y, x0, y0 int, table [][]int) (int, int) {
 	return x, y
 }
 
-func inside(x, y int, width, height int) bool {
-	return 0 <= x && x < width && 0 <= y && y < height
-}
-
+// Expects the table to be valid as generated by the above functions, in the following way:
+// * Areas with the same value must be grouped in such a way that you can change them with `fill`
+// * Values must be in the range [0, width*height)
 func flatten(table [][]int) int {
 	width, height := len(table[0]), len(table)
 	// Some number greater than the maximum possible amount
 	// of different values in table
-	MAX := width*height + 1
+	MAX := width * height
 	// Flatten all the flows at MAX+iota so we don't
 	// accidentially merge something
 	alpha := MAX
