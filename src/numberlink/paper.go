@@ -43,10 +43,6 @@ type entry struct {
 	val int
 }
 
-func Solve(paper *Paper) bool {
-	return solve(paper, paper.Width+1)
-}
-
 func NewPaper(width, height int, table []rune) *Paper {
 	paper := new(Paper)
 
@@ -70,6 +66,10 @@ func NewPaper(width, height int, table []rune) *Paper {
 	initTables(paper)
 
 	return paper
+}
+
+func Solve(paper *Paper) bool {
+	return solve(paper, paper.Width+1)
 }
 
 var Calls = 0
