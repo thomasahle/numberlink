@@ -17,6 +17,8 @@ var (
 	DIRS = [4]int{N, E, S, W}
 	// Mirrors directions so W becomes E and SE becomes NW
 	MIR = [16]int{0, S, W, S | W, N, N | S, N | W, N | S | W, E, E | S, E | W, E | S | W, N | E, N | E | S, N | E | W, N | E | S | W}
+	// Filter for N|E, N|W, S|E and S|W
+	DIAG = [16]bool{false, false, false, true, false, false, true, false, false, true, false, false, true, false, false, false}
 )
 
 type Paper struct {
@@ -27,9 +29,8 @@ type Paper struct {
 
 	source []bool
 	end    []int
-	canNW  []bool
-	canNE  []bool
-	mustNE []bool
+	canSE  []bool
+	canSW  []bool
 	next   []int
 	hist   []entry
 
@@ -78,7 +79,7 @@ func solve(paper *Paper, pos int) bool {
 	Calls++
 
 	// Final
-	if pos == (paper.Height-1)*paper.Width-2 {
+	if pos == paper.Crnr[S|E] {
 		return paper.validate()
 	}
 
@@ -106,71 +107,74 @@ func chooseConnections(paper *Paper, pos int) bool {
 				}
 				paper.goBack(histSize)
 			}
-			// If this connection is bad, the next solve will notice immidiately
-			if paper.connect(pos, S) && solve(paper, paper.next[pos]) {
-				return true
+			// South connections can create a forced SE position
+			if checkImplicitSE(paper, pos) {
+				if paper.connect(pos, S) && solve(paper, paper.next[pos]) {
+					return true
+				}
 			}
 		// If the source is already connected
 		case N, W:
 			return solve(paper, paper.next[pos])
 		}
 	} else {
-		// In some cases SW or SE is forced, but we haven't got the needed inputs
-		// Rather than putting the test in every wrong input clause, we put them here
-		if paper.Con[pos] != W && (pos == 2*w-2 || paper.Con[pos-w+1] == S|W) {
-			return false
-		}
-		if paper.Con[pos] != 0 && (pos == w+1 || paper.Con[pos-w-1] == S|E) {
-			return false
-		}
-		if paper.Con[pos] != N && paper.mustNE[pos] {
-			return false
-		}
-
 		switch paper.Con[pos] {
 		// SE
 		case 0:
-			if paper.canNW[pos] {
-				return paper.connect(pos, S|E) && solve(paper, paper.next[pos])
+			// Should we check for implied N|W?
+			if paper.canSE[pos] {
+				return paper.connect(pos, E) && paper.connect(pos, S) && solve(paper, paper.next[pos])
 			}
 		// SW or WE
 		case W:
-			if paper.canNE[pos] {
+			// Check there is a free line down to the source we are turning around
+			if paper.canSW[pos] && checkSWLane(paper, pos) && checkImplicitSE(paper, pos) {
 				if paper.connect(pos, S) && solve(paper, paper.next[pos]) {
 					return true
 				}
 				paper.goBack(histSize)
 			}
-			// In some cases SW is forced, otherwise try a simple W-E bridge
+   			// Ensure we don't block of any diagonals (NE and NW don't seem very important)
 			if paper.Con[pos-w+1] != S|W && paper.Con[pos-w-1] != S|E {
-				if paper.connect(pos, E) && solve(paper, paper.next[pos]) {
-					return true
-				}
+				return paper.connect(pos, E) && solve(paper, paper.next[pos])
 			}
 		// NW
 		case N | W:
 			// Check if the 'by others implied' turn is actually allowed
-			taken := pos == 2*w+2 || pos >= 2*w+2 && paper.Con[pos-2*w-2] == S|E
-			if (paper.source[pos-w-1] && !taken) || paper.Con[pos-w-1] == (N|W) {
+			// We don't need to check the source connection here like in N|E
+			if paper.Con[pos-w-1] == (N|W) || paper.source[pos-w-1] {
 				return solve(paper, paper.next[pos])
 			}
 		// NE or NS
 		case N:
-			// 'taken' tests whether the pivot is already active in the opposite direction
-			taken := pos == 3*w-3 || pos >= 2*w-2 && paper.Con[pos-2*w+2] == S|W
-			if (paper.source[pos-w+1] && !taken) || paper.Con[pos-w+1] == N|E {
+			// Check that we are either extending a corner or starting at a non-occupied source
+			if paper.Con[pos-w+1] == N|E || paper.source[pos-w+1] && paper.Con[pos-w+1]&(N|E) != 0 {
 				if paper.connect(pos, E) && solve(paper, paper.next[pos]) {
 					return true
 				}
 				paper.goBack(histSize)
 			}
-			// Prevents blocking off the SW diagonal
-			if !paper.mustNE[pos] && paper.Con[pos-w+1] != S|W && paper.Con[pos-w-1] != S|E {
+			// Ensure we don't block of any diagonals
+			if paper.Con[pos-w+1] != S|W && paper.Con[pos-w-1] != S|E && checkImplicitSE(paper, pos) {
 				return paper.connect(pos, S) && solve(paper, paper.next[pos])
 			}
 		}
 	}
 	return false
+}
+
+func checkSWLane(paper *Paper, pos int) bool {
+	for ; !paper.source[pos]; pos += paper.Width-1 {
+		// Con = 0 means we are crossing a SE line, N|W means a NW
+		if paper.Con[pos] != W {
+			return false
+		}
+	}
+	return true
+}
+
+func checkImplicitSE(paper *Paper, pos int) bool {
+	return !(paper.Con[pos+1] == 0) || paper.canSE[pos+1] || paper.Table[pos+1] != EMPTY
 }
 
 // As it turns out, our smart algorithm isn't 100% able to avoid self-touching flows
@@ -225,22 +229,27 @@ func (paper *Paper) goBack(histSize int) {
 }
 
 func (paper *Paper) connect(pos1 int, dir int) bool {
-	// If connect is called with multiple dir bits set:
-	// isolate one and recurse with the rest
-	if rest := dir & (dir - 1); rest != 0 {
-		if !paper.connect(pos1, rest) {
-			return false
-		}
-		dir = dir & (-dir)
-	}
+	// Asserts dir in {N, S, E, W}
 	pos2 := pos1 + paper.Vctr[dir]
 	// Cannot connect out of the paper
 	if paper.Table[pos2] == GRASS {
 		return false
 	}
-	// Check different sources aren't connected
+	// No close corners (The value of this optimization is doubtable)
+	if paper.Con[pos1] != 0 {
+		dir2 := paper.Con[pos1+paper.Vctr[paper.Con[pos1]]]
+		dir3 := paper.Con[pos1]|dir
+		if DIAG[dir2] && DIAG[dir3] && dir2&dir3 != 0 {
+			return false
+		}
+	}
+	// No loops
 	end1, end2 := paper.end[pos1], paper.end[pos2]
-	if paper.source[end1] && paper.source[end2] &&
+	if end1 == pos2 && end2 == pos1 {
+		return false
+	}
+	// Check different sources aren't connected
+	if paper.Table[end1] != EMPTY && paper.Table[end2] != EMPTY &&
 		paper.Table[end1] != paper.Table[end2] {
 		return false
 	}
@@ -285,23 +294,19 @@ func initTables(paper *Paper) {
 	}
 
 	// Pivot tables
-	paper.canNW = make([]bool, w*h)
-	paper.canNE = make([]bool, w*h)
-	paper.mustNE = make([]bool, w*h)
+	paper.canSE = make([]bool, w*h)
+	paper.canSW = make([]bool, w*h)
 	for pos := range paper.Table {
 		if paper.source[pos] {
 			d := paper.Vctr[N|W]
-			for p := pos + d; paper.Table[p] == EMPTY; p += d {
-				paper.canNW[p] = true
+ 			for p := pos + d; paper.Table[p] == EMPTY; p += d {
+				paper.canSE[p] = true
 			}
 			d = paper.Vctr[N|E]
 			for p := pos + d; paper.Table[p] == EMPTY; p += d {
-				paper.canNE[p] = true
+				paper.canSW[p] = true
 			}
 		}
-	}
-	for pos := paper.Crnr[S|W]; paper.Table[pos] == EMPTY; pos += -w + 1 {
-		paper.mustNE[pos] = true
 	}
 
 	// Diagonal next table
@@ -325,6 +330,9 @@ func initTables(paper *Paper) {
 
 	// Connection table
 	paper.Con = make([]int, w*h)
+
+	// History
+	paper.hist = make([]entry, 0, 4*w*h)
 }
 
 func xrange(i int, j int, step int) []int {

@@ -9,11 +9,12 @@ import "strconv"
 import "bufio"
 
 var (
-	colorsFlag   = flag.Bool("colors", false, "Make the output more readable with colors")
-	tubesFlag    = flag.Bool("tubes", false, "Draw lines between sources")
-	callsFlag    = flag.Bool("calls", false, "Count number of recursive calls")
-	profileFlag  = flag.String("profile", "", "Write profiling data to file")
-	generateFlag = flag.String("generate", "", "Generate a puzzle of a certain size. Usage: --generate=5x5")
+	colorsFlag    = flag.Bool("colors", false, "Make the output more readable with colors")
+	tubesFlag     = flag.Bool("tubes", false, "Draw lines between sources")
+	callsFlag     = flag.Bool("calls", false, "Count number of recursive calls")
+	callsOnlyFlag = flag.Bool("calls-only", false, "Print only the culminative number of recursive calls")
+	profileFlag   = flag.String("profile", "", "Write profiling data to file")
+	generateFlag  = flag.String("generate", "", "Generate a puzzle of a certain size. Usage: --generate=5x5")
 )
 
 func main() {
@@ -94,15 +95,21 @@ func main() {
 			lines = append(lines, line)
 		}
 
-		// Done parsing stuff, time for the fun part
-		for i := 0; i < 1; i++ {
-			p, err := Parse(w, h, lines)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, err.Error())
-				os.Exit(1)
-			}
+		/*for i := 0; i < 5; i++ {
+			p, _ := Parse(w, h, lines)
+			fmt.Println(Solve(p))
+		}*/
 
-			if Solve(p) {
+		// Done parsing stuff, time for the fun part
+		p, err := Parse(w, h, lines)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		res := Solve(p)
+		if !*callsOnlyFlag {
+			if res {
 				fmt.Println("Found a solution!")
 				switch {
 				case *tubesFlag:
@@ -120,5 +127,8 @@ func main() {
 			}
 			fmt.Println()
 		}
+	}
+	if *callsOnlyFlag {
+		fmt.Printf("Called %d times\n", Calls)
 	}
 }

@@ -11,7 +11,7 @@ func (e *ParseError) Error() string {
 	return fmt.Sprintf("ParseError: '%s' at line %d", e.Problem, e.Line)
 }
 
-func Parse(width int, height int, lines []string) (*Paper, *ParseError) {
+func Parse(width int, height int, lines []string) (*Paper, error) {
 	if width*height == 0 {
 		return nil, &ParseError{0, "width and height cannot be 0"}
 	}
