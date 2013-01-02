@@ -84,12 +84,7 @@ func solve(paper *Paper, pos int) bool {
 	}
 
 	// Connect
-	histSize := len(paper.hist)
-	res := chooseConnections(paper, pos)
-	if !res {
-		paper.goBack(histSize)
-	}
-	return res
+	return chooseConnections(paper, pos)
 }
 
 func chooseConnections(paper *Paper, pos int) bool {
@@ -100,7 +95,7 @@ func chooseConnections(paper *Paper, pos int) bool {
 		switch paper.Con[pos] {
 		// If the source is not yet connection
 		case 0:
-			// It will be a long time before we come back to this row, so do an extra check
+			// We can't connect E if we have a NE corner
 			if paper.Con[pos-w+1] != S|W {
 				if paper.connect(pos, E) && solve(paper, paper.next[pos]) {
 					return true
@@ -160,6 +155,7 @@ func chooseConnections(paper *Paper, pos int) bool {
 			}
 		}
 	}
+	paper.goBack(histSize)
 	return false
 }
 
@@ -259,6 +255,7 @@ func (paper *Paper) connect(pos1 int, dir int) bool {
 	// Change states of ends to connect pos1 and pos2
 	paper.setnrem(paper.end, end1, end2)
 	paper.setnrem(paper.end, end2, end1)
+
 	return true
 }
 
