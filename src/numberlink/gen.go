@@ -240,8 +240,8 @@ func flatten(table [][]int) int {
 	// Then invert to get what we actually wanted
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			table[y][x] = -table[y][x]-1
+			table[y][x] = -table[y][x] - 1
 		}
 	}
-	return -alpha-1
+	return -alpha - 1
 }
