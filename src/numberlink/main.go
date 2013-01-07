@@ -33,18 +33,18 @@ func main() {
 	if *generateFlag != "" {
 		size := strings.Split(*generateFlag, "x")
 		if len(size) != 2 {
-			fmt.Fprintf(os.Stderr, "Error: Must have exactly two arguments to --generate")
+			fmt.Fprintf(os.Stderr, "Error: Must have exactly two arguments to --generate\n")
 			os.Exit(1)
 		}
 		width, err1 := strconv.Atoi(size[0])
 		height, err2 := strconv.Atoi(size[1])
 		if err1 != nil || err2 != nil {
-			fmt.Fprintf(os.Stderr, "Error: Unable to parse arguments to --generate")
+			fmt.Fprintf(os.Stderr, "Error: Unable to parse arguments to --generate\n")
 			os.Exit(1)
 		}
 		pzzl, _, err := Generate(width, height)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			os.Exit(1)
 		} else {
 			fmt.Println(len(pzzl[0]), len(pzzl))

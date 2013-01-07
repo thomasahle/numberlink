@@ -136,8 +136,8 @@ func oddCorner(table [][]int) {
 
 func findFlows(table [][]int) {
 	width, height := len(table[0]), len(table)
-	for i := 0; i < square(width*height); i++ {
-		x, y := rand.Intn(width), rand.Intn(height)
+	for _, p := range rand.Perm(width*height) {
+		x, y := p%width, p/width
 		if isFlowHead(x, y, table) {
 			layFlow(x, y, table)
 		}
@@ -162,7 +162,7 @@ func inside(x, y int, width, height int) bool {
 
 func layFlow(x, y int, table [][]int) {
 	width, height := len(table[0]), len(table)
-	for i := 0; i < 4; i++ {
+	for _, i := range rand.Perm(4) {
 		x1, y1 := x+DX[i], y+DY[i]
 		if inside(x1, y1, width, height) && canConnect(x, y, x1, y1, table) {
 			fill(x1, y1, table[y][x], table)
@@ -211,7 +211,7 @@ func fill(x, y int, alpha int, table [][]int) {
 
 func follow(x, y, x0, y0 int, table [][]int) (int, int) {
 	width, height := len(table[0]), len(table)
-	for _, i := range rand.Perm(4) {
+	for i := 0; i < 4; i++ {
 		x1, y1 := x+DX[i], y+DY[i]
 		if inside(x1, y1, width, height) && !(x1 == x0 && y1 == y0) &&
 			table[y][x] == table[y1][x1] {
