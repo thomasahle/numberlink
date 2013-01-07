@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 import "flag"
+import "io"
 import "os"
 import "runtime/pprof"
 import "strings"
@@ -20,16 +21,7 @@ var (
 func main() {
 	flag.Parse()
 
-	if *profileFlag != "" {
-		f, err := os.Create(*profileFlag)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
-
+	// Generating
 	if *generateFlag != "" {
 		size := strings.Split(*generateFlag, "x")
 		if len(size) != 2 {
@@ -55,11 +47,25 @@ func main() {
 		return
 	}
 
+	// Profiling
+	if *profileFlag != "" {
+		f, err := os.Create(*profileFlag)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
+	// Normal run
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			if err != io.EOF {
+				fmt.Fprintln(os.Stderr, err.Error())
+			}
 			break
 		}
 		line = strings.TrimSpace(line)
@@ -76,11 +82,11 @@ func main() {
 			bad = bad || err1 != nil || err2 != nil
 		}
 		if bad {
-			fmt.Fprintf(os.Stderr, "Error: Expected 'width height' got '%s'", line)
+			fmt.Fprintf(os.Stderr, "Error: Expected 'width height' got '%s'\n", line)
 			os.Exit(1)
 		}
 
-		// We use 0 0 as a visible eof mark
+		// We use 0 0 as an end of puzzles mark
 		if w == 0 && h == 0 {
 			break
 		}
@@ -88,29 +94,25 @@ func main() {
 		for i := 0; i < h; i++ {
 			line, err := reader.ReadString('\n')
 			if err != nil {
-				fmt.Fprintf(os.Stderr, err.Error())
+				if err != io.EOF {
+					fmt.Fprintln(os.Stderr, err.Error())
+				}
 				os.Exit(1)
 			}
 			line = strings.TrimSpace(line)
 			lines = append(lines, line)
 		}
 
-		/*for i := 0; i < 5; i++ {
-			p, _ := Parse(w, h, lines)
-			fmt.Println(Solve(p))
-		}*/
-
 		// Done parsing stuff, time for the fun part
 		p, err := Parse(w, h, lines)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
 		res := Solve(p)
 		if !*callsOnlyFlag {
 			if res {
-				fmt.Println("Found a solution!")
 				switch {
 				case *tubesFlag:
 					PrintTubes(p, *colorsFlag)
@@ -118,7 +120,7 @@ func main() {
 					PrintSimple(p, *colorsFlag)
 				}
 			} else {
-				fmt.Println("No solutions")
+				fmt.Println("IMPOSSIBLE")
 			}
 
 			if *callsFlag {

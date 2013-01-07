@@ -15,8 +15,8 @@ const (
 var (
 	// Array for iterating over simple directions
 	DIRS = [4]int{N, E, S, W}
-	// Mirrors directions so W becomes E and SE becomes NW
-	MIR = [16]int{0, S, W, S | W, N, N | S, N | W, N | S | W, E, E | S, E | W, E | S | W, N | E, N | E | S, N | E | W, N | E | S | W}
+	// Mirrors simple directions
+	MIR = [16]int{N: S, E: W, S: N, W: E}
 	// Filter for N|E, N|W, S|E and S|W
 	DIAG = [16]bool{N | E: true, N | W: true, S | E: true, S | W: true}
 )
@@ -144,6 +144,7 @@ func chooseConnection(paper *Paper, pos int) bool {
 	return false
 }
 
+// Check that a SW line of corners, starting at pos, will not intersect a SE or NW line
 func checkSWLane(paper *Paper, pos int) bool {
 	for ; !paper.source[pos]; pos += paper.Width - 1 {
 		// Con = 0 means we are crossing a SE line, N|W means a NW
@@ -154,13 +155,16 @@ func checkSWLane(paper *Paper, pos int) bool {
 	return true
 }
 
+// Check that a south connection at pos won't create a forced, illegal SE corner at pos+1
+// Somethine like: │└
+//                 │   <-- Forced SE corner
 func checkImplicitSE(paper *Paper, pos int) bool {
 	return !(paper.Con[pos+1] == 0) || paper.canSE[pos+1] || paper.Table[pos+1] != EMPTY
 }
 
 func tryConnection(paper *Paper, pos1 int, dirs int) bool {
 	// Extract the (last) bit which we will process in this call
-	dir := (dirs ^ (dirs - 1)) & dirs
+	dir := dirs & -dirs
 	pos2 := pos1 + paper.Vctr[dir]
 	end1, end2 := paper.end[pos1], paper.end[pos2]
 
@@ -216,8 +220,9 @@ func tryConnection(paper *Paper, pos1 int, dirs int) bool {
 	return res
 }
 
-// As it turns out, our smart algorithm isn't 100% able to avoid self-touching flows
-// Hence we need this validation to filter out the false positives
+// As it turns out, though our algorithm avoids must self-touching flows, it
+// can be tricked to allow some. Hence we need this validation to filter out
+// the false positives
 func (paper *Paper) validate() bool {
 	w, h := paper.Width, paper.Height
 	vtable := make([]rune, w*h)
@@ -277,7 +282,7 @@ func (paper *Paper) initTables() {
 	paper.Crnr[S|E] = h*w - w - 2
 	paper.Crnr[S|W] = h*w - 2*w + 1
 
-	// Source table
+	// Table to easily check if a position is a source
 	paper.source = make([]bool, w*h)
 	for pos := 0; pos < w*h; pos++ {
 		paper.source[pos] = paper.Table[pos] != EMPTY && paper.Table[pos] != GRASS
@@ -299,7 +304,7 @@ func (paper *Paper) initTables() {
 		}
 	}
 
-	// Diagonal next table
+	// Diagonal 'next' table
 	paper.next = make([]int, w*h)
 	last := 0
 	for _, pos := range append(
@@ -322,6 +327,7 @@ func (paper *Paper) initTables() {
 	paper.Con = make([]int, w*h)
 }
 
+// Makes a slice of the interval [i, i+step, i+2step, ..., j)
 func xrange(i int, j int, step int) []int {
 	slice := make([]int, 0, (j-i+step-1)/step)
 	for i < j {

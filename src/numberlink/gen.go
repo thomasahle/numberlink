@@ -17,17 +17,20 @@ func square(x int) int {
 // Generate and prints a width x height puzzle of numberlink
 // The algorithm works as follows:
 // 1) First the board is tiled with 2x1 dominos in a simple, deterministic way.
-//    If this is not possible (on an odd area paper), the bottom right corner is
-// 	  left as a singleton
-// 2) Then the dominos are randomly shuffled by rotating random pairs of neighbours.
-//    This is is not done in the case of width or height equal to 1
-// 3) Now, in the case of an odd area paper, the bottom right corner is attached to
-//    one of its neighbour dominos. This will always be possible.
-// 4) Finally we can start finding random paths through the dominos, combining them
-//    as we pass through. Special care is taken not to connect 'neighboour flows'
-//    which would create puzzles that 'double back on themselves'
-// 5) Before the puzzle is printed we 'compact' the range of colors used, as much as possible
-// 6) The puzzle is printed by replacing all positions that aren't flow-heads with a .
+//    If this is not possible (on an odd area paper), the bottom right corner
+//    is left unconnected
+// 2) Then the dominos are randomly shuffled by flipping random pairs of
+//    neighbours. This is (obviously) not done in the case of width or height
+//    equal to 1
+// 3) Now, in the case of an odd area paper, the bottom right corner is
+//    attached to one of its neighbour dominos. This will always be possible.
+// 4) Finally we can start finding random paths through the dominos, combining
+//    them as we pass through. Special care is taken not to connect 'touching
+//    flows' which would create puzzles that 'double back on themselves'
+// 5) Before the puzzle is printed we 'compact' the range of colors used, as
+//    much as possible
+// 6) The puzzle is printed by replacing all positions that aren't flow-heads
+//    with a .
 func Generate(width, height int) ([]string, []string, error) {
 	if width == 0 || height == 0 || width == 1 && height == 1 {
 		return nil, nil, fmt.Errorf("Error: Requires bigger paper size")
@@ -136,7 +139,7 @@ func oddCorner(table [][]int) {
 
 func findFlows(table [][]int) {
 	width, height := len(table[0]), len(table)
-	for _, p := range rand.Perm(width*height) {
+	for _, p := range rand.Perm(width * height) {
 		x, y := p%width, p/width
 		if isFlowHead(x, y, table) {
 			layFlow(x, y, table)

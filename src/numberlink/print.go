@@ -21,6 +21,9 @@ var (
 	TUBE = [16]rune{' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼'}
 )
 
+// Print the paper by filling each flow with a character in [a-zA-Z0-9]
+// If color is true, each flow will be colored by one of 16 terminal color
+// codes
 func PrintSimple(paper *Paper, color bool) {
 	colors := makeColorTable(paper, !color)
 	table := fillTable(paper)
@@ -38,6 +41,9 @@ func PrintSimple(paper *Paper, color bool) {
 	}
 }
 
+// Print the paper using unicode table characters such as └ and │
+// If color is true, each flow will be colored by one of 16 terminal color
+// codes
 func PrintTubes(paper *Paper, color bool) {
 	colors := makeColorTable(paper, !color)
 	for y := 1; y < paper.Height-1; y++ {
@@ -61,6 +67,7 @@ func PrintTubes(paper *Paper, color bool) {
 }
 
 // Assigns a terminal color code to every position on the paper
+// If empty is true, the table will be a dummy with all empty strings
 func makeColorTable(paper *Paper, empty bool) []string {
 	color := make([]string, paper.Width*paper.Height)
 	if !empty {
@@ -92,6 +99,8 @@ func makeColorTable(paper *Paper, empty bool) []string {
 }
 
 // Does a bfs search on every source, filling out its connected nodes
+// This is neccesary since we normally store only relative connection
+// information
 func fillTable(paper *Paper) []rune {
 	w, h := paper.Width, paper.Height
 	table := make([]rune, w*h)
