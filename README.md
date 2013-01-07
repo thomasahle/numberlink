@@ -133,6 +133,12 @@ happen very often, and hence we don't need to check for the case during solving.
 Only once the whole paper is filled out do we check if we have done something
 illegal.
 
+An optimization that is still unexplored is to try and avoid early self touch of
+this kind:
+
+    ─y┌y
+    ──┘z
+
 History
 -------
 
@@ -146,3 +152,4 @@ Legal
 
 Numberlink is released under the GPL3
 Read LICENSE for more details
+
