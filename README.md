@@ -2,24 +2,22 @@ Numberlink
 ==========
 
 Numberlink is a small, but very fast, program to solve puzzles of
-Numberlink/Arukone/Nanbarinku. The puzzle involves finding paths to connect
+Numberlink/Arukone/Nanbarinku. The puzzle involves finding links to connect
 numbers or letters in a grid.
 
-See http://en.wikipedia.org/wiki/Numberlink for a detailed description.
+See http://wikipedia.org/wiki/Numberlink for a detailed description.
 
 Running it
 ----------
 
-Download Numberlink from https://github.com/thomasahle/numberlink
+You can download the source code of Numberlink at
+https://github.com/thomasahle/numberlink
 
-Numberlink is written in the Go Programming Language and the binary can be
-created by running
+Numberlink is written in the Go Programming Language and is compiled using
+`$ go install numberlink`. This won't install anything on your system. For more
+information on compiling, see the INSTALL file.
 
-    go install numberlink
-
-For more information on compiling, read the INSTALL file.
-
-When you have created the binary, you can run `bin/numberlink [options]`.
+When you have created the binary, you can run `$ bin/numberlink [options]`.
 Numberlink will then read puzzles from standard input in the following format:
 
     5 4
@@ -29,8 +27,8 @@ Numberlink will then read puzzles from standard input in the following format:
     .....
 
 The first line consists of the width and height of the puzzle.
-The following lines contains the puzzle where '.' represents an empty square and
-[a-zA-Z0-9] are sources that must be connected.
+The following lines contains the puzzle where `.` represents an empty square and
+letters or digits are the sources that must be connected.
 
 Numberlink then prints the solved puzzle to standard input, either in the format
 below, or as specified by command line flags:
@@ -41,14 +39,15 @@ below, or as specified by command line flags:
     ACCCA
     AAAAA
 
-Also read the INSTALL file
-See bin/numberlink --help
+If the puzzle wasn't solvable, `IMPOSSIBLE` will be printed.
+
+To learn about the available option flags, see `$ bin/numberlink --help`.
 
 What Numberlink is not
 ----------------------
 
 You can't use numberlink for checking if a puzzle is unique. Indeed numberlink
-will only solve puzzles where the solution use 100% of the paper and no path
+will only solve puzzles where the solution use 100% of the paper and no link
 touches itself.
 
 If you want to find the number of solution to a general numberlink puzzle I
@@ -58,16 +57,14 @@ How it works
 ------------
 
 Numberlink solves puzzles using a heavily pruned backtracking search on an
-optimied datastructure.
+optimied datastructure. In particular the following pruning heuristics are used:
 
-In particular the following heuristics are used:
-
-* Partial paths
+* Partial links
 * Corner heuristic
 * Optimistic (late validation)
 
 There are multiple ways to do backtracking on numberlink puzzles.
-The most obvious is to start at a source, choose a path to its other end and
+The most obvious is to start at a source, choose a link to its other end and
 recurse. Alternatively one can start at all sources at the same time, or
 systematically fill out the squares on the paper in some predefined order.
 
@@ -87,10 +84,10 @@ at the sources:
 * We never block a source from its other end
 * We always know exactly what squares around us have already been connected
 
-The challange with this approach is that we need to manage 'partial paths' that
+The challange with this approach is that we need to manage 'partial links' that
 aren't yet connected to anything. We could do this by disjoint-set, but it is
-simpler to just keep an array such that if pos is a start of a path then
-end[pos] is the position of the other end. This is easily updated when two paths
+simpler to just keep an array such that if pos is a start of a link then
+end[pos] is the position of the other end. This is easily updated when two links
 are merged, and can be used to ensure different sources aren't connected.
 
 The last question one may ask is 'why diagonally?' Instead one could have done
@@ -103,12 +100,12 @@ to diagonals, but with diagonals the tree is heigher.
 The corner heuristic is the most important part of what makes Numberlink fast.
 It relies on the obvervation that if a square is filled out with a ┐ the only
 option for the lower left square is another ┐ or a source. Anything else will
-either force a self touching path or connect into the side of the paper.
+either force a self touching link or connect into the side of the paper.
 
 Taking the inductive closure of the above obvervation we see that all
-path-turns, or 'corners', must be found in 'spikes' 'coming out' of the sources.
+link-turns, or 'corners', must be found in 'spikes' 'coming out' of the sources.
 Indeed a source can't even have such a spike in two opposite direcitons, as it
-would create a flow surounding the source. In conclusion we see that a solution
+would create a link surounding the source. In conclusion we see that a solution
 to a numberlink puzzle can be represented uniquely as a set of signed integer
 pairs for each source, describing the length of its two spikes.
 
@@ -119,8 +116,8 @@ noticing that the dual representation means especially very sparse puzzles can
 be efficiently solved.
 
 The corner heuristic also protects us from a lot of illegal solutions, like
-connecting a path head to the middle of another path. It doesn't however quite
-save us from self touching paths, as this example shows:
+connecting a link head to the middle of another link. It doesn't however quite
+save us from self touching links, as this example shows:
 
     4 4
     ....
