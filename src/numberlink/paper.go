@@ -75,7 +75,7 @@ func chooseConnection(paper *Paper, pos int) bool {
 	Calls++
 
 	// Final
-	if pos == paper.Crnr[S|E] {
+	if pos == 0 {
 		return paper.validate()
 	}
 
@@ -230,13 +230,13 @@ func (paper *Paper) validate() bool {
 		if paper.source[pos] {
 			// Run throw the flow
 			alpha := paper.Table[pos]
-			old, next := pos, pos
+			p, old, next := pos, pos, pos
 			for {
 				// Mark our path as we go
-				vtable[pos] = alpha
+				vtable[p] = alpha
 				for _, dir := range DIRS {
-					cand := pos + paper.Vctr[dir]
-					if paper.Con[pos]&dir != 0 {
+					cand := p + paper.Vctr[dir]
+					if paper.Con[p]&dir != 0 {
 						if cand != old {
 							next = cand
 						}
@@ -247,10 +247,10 @@ func (paper *Paper) validate() bool {
 					}
 				}
 				// We have reached the end
-				if old != pos && paper.source[pos] {
+				if old != p && paper.source[p] {
 					break
 				}
-				old, pos = pos, next
+				old, p = p, next
 			}
 		}
 	}
