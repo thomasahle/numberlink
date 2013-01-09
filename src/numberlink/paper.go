@@ -240,7 +240,7 @@ func (paper *Paper) validate() bool {
 						if cand != old {
 							next = cand
 						}
-					} else if vtable[cand] == alpha && !paper.source[cand] {
+					} else if vtable[cand] == alpha {
 						// We aren't connected, but it has our color,
 						// this is exactly what we doesn't want.
 						return false
