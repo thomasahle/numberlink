@@ -70,6 +70,14 @@ a...
 .dcba.
 ......
 
+# Problem with two solutions
+4 5
+...C
+.BA.
+....
+.AB.
+C...
+
 # Tests weird dimensions
 1 2
 a
