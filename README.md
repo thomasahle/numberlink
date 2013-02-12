@@ -1,10 +1,11 @@
 Numberlink
 ==========
 
-Numberlink is a small, but very fast, program to solve puzzles of
-Numberlink/Arukone/Nanbarinku. The puzzle involves finding links to connect
-numbers or letters in a grid.
+Numberlink is a small, but very fast, program for solving puzzles of
+Numberlink/Arukone/Nanbarinku/FlowFree. Instances of size 40x40 are casually solved,
+and the run time is often linear for sparse enough puzzles.
 
+The Numberlink puzzle involves finding links to connect numbers or letters in a grid.
 See http://wikipedia.org/wiki/Numberlink for a detailed description.
 
 Running it
