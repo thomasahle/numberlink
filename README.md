@@ -44,6 +44,47 @@ If the puzzle wasn't solvable, `IMPOSSIBLE` is be printed.
 
 To learn about the available command line flags, see `$ bin/numberlink --help`. 
 
+Generating Puzzles
+------------------
+
+Examples of generating a puzzle and immediately solving it:
+
+    $ bin/numberlink -generate=10x10 | bin/numberlink -tubes
+    0─────┐120
+    3────┐│12│
+    ┌──45│└──┘
+    │┌──┘└───3
+    45┌──────6
+    ┌─┘┌─┐┌──8
+    │7─┘9││┌─a
+    └──6││││8┐
+    ┌───┘││└a│
+    97───┘└──┘
+
+and larger:
+
+    $ bin/numberlink -generate=20x20 | bin/numberlink -tubes
+    0────┐┌─┐223┌─4┌───┐
+    6───┐│17│┌─┘48┌┘9ab│
+    c──c││┌┘││de┌┘│┌┘a││
+    ┌──f││71┘3de8┌┘│5b┘│
+    │g─┐6└───┐┌──┘9┘└──┘
+    └─┐└───gh││ij┐┌────┐
+    kk└f┌─┐┌┘││└┐││┌──5i
+    ┌─┐l┘nlho│└┐│j││┌──┐
+    │q│┌r└┐┌┘│s│└─┘││┌t│
+    m│││uu│o┌┘│└─┐v│││p┘
+    ┌┘│└─r│┌┘┌┘ww│v││└─t
+    │x│┌─┐n│y│zA┐└─┘└──┐
+    qxm│B└─┘││└┐└─┐CD─┐│
+    ┌─┐│└┐┌─┘└┐└─┐│└─C│p
+    │0│└┐B│E─┐└─┐││┌─┐└D
+    ││└y│┌┘┌s└─E│z││G│HH
+    │└──┘│I│JJ┌─┘A┘│G└─F
+    │K──K│││LL│M──┐└┐┌─┐
+    └────┘│└──┘┌─O│P│NF│
+    I─────┘O───┘M─┘P└─┘N
+
 What Numberlink is not
 ----------------------
 
