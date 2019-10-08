@@ -85,6 +85,8 @@ and larger:
     └────┘│└──┘┌─O│P│NF│
     I─────┘O───┘M─┘P└─┘N
 
+See https://stackoverflow.com/a/14007585/205521 for an explaination of the algorithm.
+
 What Numberlink is not
 ----------------------
 
