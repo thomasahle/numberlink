@@ -139,7 +139,8 @@ def make_tubes(grid):
 
 def color_tubes(grid):
     """ Add colors and numbers for drawing the grid to the terminal. """
-    from colorama import Fore, Back, Style
+    from colorama import Fore, Style, init
+    init()
     tube_grid, uf = make_tubes(grid)
     letters = string.digits[1:] + string.ascii_letters
     colors = [Fore.BLUE, Fore.RED, Fore.WHITE, Fore.GREEN, Fore.YELLOW, Fore.MAGENTA, Fore.CYAN, Fore.BLACK]
