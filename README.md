@@ -47,6 +47,21 @@ To learn about the available command line flags, see `$ bin/numberlink --help`.
 Generating Puzzles
 ------------------
 
+The python code in `gen/gen.py` can be used to generate very large puzzles:
+
+![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/puzzle.png)
+
+To create such puzzles, simply run the script with your intended width and height.
+(Notice that puzzles with hegihts above 20 may take a while to generate.)(
+
+    $ python gen/gen.py 40 20 --solve
+
+As default it triees to put around `sqrt(width * height)` number pairs in a puzzle, but this can be controlled with the `--min` and `--max flags`.
+See `gen.py --help` for more options.
+
+Old Generator
+-------------
+
 Examples of generating a puzzle and immediately solving it:
 
     $ bin/numberlink -generate=10x10 | bin/numberlink -tubes
