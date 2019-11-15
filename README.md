@@ -1,20 +1,16 @@
 Numberlink
 ==========
 
-Numberlink is a small, but very fast, program for solving puzzles of
-Numberlink/Arukone/Nanbarinku/FlowFree. Instances of size 40x40 are casually solved,
-and the run time is often linear for sparse enough puzzles.
+Numberlink is a very fast program for generating and solving large instances of the puzzle [Numberlink / Arukone / Nanbarinku / Flow Free](https://en.wikipedia.org/wiki/Numberlink). Instances of size 40x20 are casually solved and generated, and the complete set of [270 puzzles at Janko.at](https://www.janko.at/Raetsel/Arukone-3/index.htm)
+is solved in 0.14 seconds(!).
 
-The Numberlink puzzle involves finding links to connect numbers or letters in a grid.
-See http://wikipedia.org/wiki/Numberlink for a detailed description.
+Example generated puzzle:
+![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/puzzle.png)
 
 Running it
 ----------
 
-You can download the source code of Numberlink at
-https://github.com/thomasahle/numberlink
-
-Numberlink is written in the Go Programming Language and is compiled using
+The Numberlink solver is written in the Go Programming Language and is compiled using
 `$ go install numberlink`. This won't install anything on your system. For more
 information on compiling, see the INSTALL file.
 
@@ -47,16 +43,12 @@ To learn about the available command-line flags, see `$ bin/numberlink --help`.
 Generating Puzzles
 ------------------
 
-The python code in `gen/gen.py` can be used to generate very large puzzles:
-
-![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/puzzle.png)
-
-To create such puzzles, simply run the script with your intended width and height.
+The python code in `gen/gen.py` can be used to generate very large puzzles. To create such puzzles, simply run the script with your intended width and height.
 (Notice that puzzles with heights above 20 may take a while to generate.)
 
     $ python gen/gen.py 40 20 --solve
 
-As default it tries to put around `sqrt(width * height)` number pairs in a puzzle, but this can be controlled with the `--min` and `--max flags`.
+By default it tries to put around `sqrt(width * height)` number pairs in a puzzle, but this can be controlled with the `--min` and `--max flags`.
 See `gen.py --help` for more options.
 
 Old Generator
