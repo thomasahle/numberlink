@@ -23,6 +23,8 @@ parser.add_argument('--solve', action='store_true',
                     help='Print solution as well as puzzle')
 parser.add_argument('--zero', action='store_true',
                     help='Print puzzle in zero format')
+parser.add_argument('--no-colors', action='store_true',
+                    help='Print puzzles without colors')
 args = parser.parse_args()
 
 
@@ -137,21 +139,26 @@ def make_tubes(grid):
     return tube_grid, uf
 
 
-def color_tubes(grid):
+def color_tubes(grid, no_colors=False):
     """ Add colors and numbers for drawing the grid to the terminal. """
-    from colorama import Fore, Style, init
-    init()
+    if not no_colors:
+        from colorama import Fore, Style, init
+        init()
+        colors = [Fore.BLUE, Fore.RED, Fore.WHITE, Fore.GREEN, Fore.YELLOW, Fore.MAGENTA, Fore.CYAN, Fore.BLACK]
+        colors = colors + [c+Style.BRIGHT for c in colors]
+        reset = Style.RESET_ALL + Fore.RESET
+    else:
+        colors = ['']
+        reset = ''
     tube_grid, uf = make_tubes(grid)
     letters = string.digits[1:] + string.ascii_letters
-    colors = [Fore.BLUE, Fore.RED, Fore.WHITE, Fore.GREEN, Fore.YELLOW, Fore.MAGENTA, Fore.CYAN, Fore.BLACK]
-    colors = colors + [c+Style.BRIGHT for c in colors]
     char = collections.defaultdict(lambda: letters[len(char)])
     col = collections.defaultdict(lambda: colors[len(col)%len(colors)])
     for x in range(tube_grid.w):
         for y in range(tube_grid.h):
             if tube_grid[x,y] == 'x':
                 tube_grid[x,y] = char[find(uf,(x,y))]
-            tube_grid[x,y] = col[find(uf,(x,y))] + tube_grid[x,y] + Style.RESET_ALL + Fore.RESET
+            tube_grid[x,y] = col[find(uf,(x,y))] + tube_grid[x,y] + reset
     return tube_grid
 
 
@@ -364,7 +371,7 @@ def main():
     min_numbers = n*2//3 if args.min < 0 else args.min
     max_numbers = n*3//2 if args.max < 0 else args.max
     grid = make(w, h, min_numbers, max_numbers)
-    color_grid = color_tubes(grid)
+    color_grid = color_tubes(grid, no_colors=args.no_colors)
 
     # Print stuff
     debug(grid)
