@@ -28,11 +28,11 @@ Numberlink will then read puzzles from standard input in the following format:
     .....
 
 The first line consists of the width and height of the puzzle.
-The following lines contains the puzzle where `.` represents an empty square and
+The following lines contain the puzzle where `.` represents an empty square and
 letters or digits are the sources that must be connected.
 
 Numberlink then prints the solved puzzle to standard output, either in the
-format below, or as specified by command line flags:
+format below, or as specified by command-line flags:
 
     5 4
     CCBBB
@@ -40,9 +40,9 @@ format below, or as specified by command line flags:
     ACCCA
     AAAAA
 
-If the puzzle wasn't solvable, `IMPOSSIBLE` is be printed.
+If the puzzle wasn't solvable, `IMPOSSIBLE` is printed.
 
-To learn about the available command line flags, see `$ bin/numberlink --help`. 
+To learn about the available command-line flags, see `$ bin/numberlink --help`. 
 
 Generating Puzzles
 ------------------
@@ -52,11 +52,11 @@ The python code in `gen/gen.py` can be used to generate very large puzzles:
 ![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/puzzle.png)
 
 To create such puzzles, simply run the script with your intended width and height.
-(Notice that puzzles with hegihts above 20 may take a while to generate.)(
+(Notice that puzzles with heights above 20 may take a while to generate.)
 
     $ python gen/gen.py 40 20 --solve
 
-As default it triees to put around `sqrt(width * height)` number pairs in a puzzle, but this can be controlled with the `--min` and `--max flags`.
+As default it tries to put around `sqrt(width * height)` number pairs in a puzzle, but this can be controlled with the `--min` and `--max flags`.
 See `gen.py --help` for more options.
 
 Old Generator
@@ -100,14 +100,14 @@ and larger:
     └────┘│└──┘┌─O│P│NF│
     I─────┘O───┘M─┘P└─┘N
 
-See https://stackoverflow.com/a/14007585/205521 for an explaination of the algorithm.
+See https://stackoverflow.com/a/14007585/205521 for an explanation of the algorithm.
 
 What Numberlink is not
 ----------------------
 
 You can't use numberlink for checking if a puzzle is unique. Indeed numberlink
 will assume the puzzle has just one solution and only it such that the solution
-uses 100% of the paper and no link touches itself. Hence some non unique puzzles
+uses 100% of the paper and no link touches itself. Hence some non-unique puzzles
 will be solved, while others will be `IMPOSSIBLE`.
 
 If you want to find the number of solution to a general numberlink puzzle, I
@@ -152,7 +152,7 @@ at the sources:
 
 The challenge with this approach is that we need to manage 'partial links' that
 aren't yet connected to anything. We don't want to accidentally connect a link
-to itself, or to connect the ends to different labeled sources.
+to itself, or to connect the ends to different labelled sources.
 This problem can be solved efficiently by the disjoint-set data structure, but
 it is simpler for us to just keep an array such that if `pos` is a 'link head'
 then `end[pos]` is the current position of the other end. Initially
@@ -167,14 +167,14 @@ either have to be a source or to be a SW corner as well. Anything else will
 force a self-touching link.
 
 Taking the inductive closure of the above observation, we see that all
-corners, must be found in 'spikes' rooted at the sources. Indeed a source can't
+corners must be found in 'spikes' rooted at the sources. Indeed a source can't
 even have such a spike in two opposite directions, as it would create a link
-surrounding the source. All in all we conclude that any solution to a numberlink
+surrounding the source. All in all, we conclude that any solution to a numberlink
 puzzle can be represented uniquely as a set of signed integer pairs, one pair
 for each source, describing the length of its two spikes.
 
 We don't directly use the above representation however, as it doesn't seem to
-suggest an easy way to backtrack. Instead we backtrack on the partial link
+suggest an easy way to backtrack. Instead, we backtrack on the partial link
 representation, but make sure that no connections are made, which would create
 an illegal situation in the dual representation. It is worth noticing that the
 dual representation means especially very sparse puzzles can be efficiently
@@ -202,7 +202,7 @@ prune early is this one:
     ─y┌y
     ──┘z
 
-The last question one may ask is 'why search diagonally?' Instead one could have
+The last question one may ask is 'why search diagonally?' Instead, one could have
 walked row by row, or with an expanding boundary like a bfs search. While the
 later approach may allow us to fill out some obvious squares higher up in the
 tree, it doesn't give us much predictability in the structure of the filled out
@@ -220,7 +220,7 @@ http://spivey.oriel.ox.ac.uk/wiki/index.php/Programming_competition_2012
 Legal
 -----
 
-Numberlink is released under the GPL3.
+Numberlink is released under the Affero GPL3.
 
 Read LICENSE for more details.
 
