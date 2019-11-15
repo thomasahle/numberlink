@@ -73,8 +73,9 @@ class Mitm:
     def _good_paths(self, x, y, dx, dy, budget, seen=None):
         if seen is None:
             seen = set()
-        if budget <= 0:
+        if budget >= 0:
             yield (), (x,y,dx,dy)
+        if budget <= 0:
             return
         seen.add((x, y)) # Remember cleaning this up (A)
         x1, y1 = x+dx, y+dy

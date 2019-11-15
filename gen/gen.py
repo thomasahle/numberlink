@@ -25,6 +25,8 @@ parser.add_argument('--zero', action='store_true',
                     help='Print puzzle in zero format')
 parser.add_argument('--no-colors', action='store_true',
                     help='Print puzzles without colors')
+parser.add_argument('--terminal-only', action='store_true',
+                    help='Don\'t show the puzzle in matplotlib')
 args = parser.parse_args()
 
 
@@ -315,7 +317,7 @@ def solution_lines(grid):
     return done.values()
 
 
-def draw_puzzle(grid, include_solution=False):
+def plot_puzzle(grid, include_solution=False):
     import matplotlib.pyplot as plt
     tg, uf = make_tubes(grid)
 
@@ -375,6 +377,8 @@ def main():
 
     # Print stuff
     debug(grid)
+    if args.solve:
+        print(color_grid)
 
     print(w, h)
     if args.zero:
@@ -394,11 +398,8 @@ def main():
             print()
 
     # Draw with pyplot
-    if args.solve:
-        print(color_grid)
-        draw_puzzle(grid, include_solution=True)
-    else:
-        draw_puzzle(grid)
+    if not args.terminal_only:
+        plot_puzzle(grid, include_solution=args.solve)
 
 
 if __name__ == '__main__':
