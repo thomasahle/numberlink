@@ -222,7 +222,7 @@ def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
     # The table should be genearted outside of make to give the best performance
     if not mitm:
         mitm = Mitm(lr_price=2, t_price=1)
-        mitm.prepare(max(h,15))
+        mitm.prepare(max(h,10))
 
     gtries = 0
     while True:
@@ -386,7 +386,10 @@ def main():
 
     debug('Preprocessing...')
     mitm = Mitm(lr_price=2, t_price=1)
-    mitm.prepare(max(h,18))
+    # Using a larger path length in mitm might increase puzzle complexity, but
+    # 8 or 10 appears to be the sweet spot if we want small sizes like 4x4 to
+    # work.
+    mitm.prepare(max(h,10))
     debug('Generating puzzle...')
 
     for _ in range(args.n):
