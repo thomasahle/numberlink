@@ -13,6 +13,8 @@ parser.add_argument('width', type=int, default=10,
                     help='Width of the puzzle')
 parser.add_argument('height', type=int, default=10,
                     help='Height of the puzzle')
+parser.add_argument('n', type=int, default=1,
+                    help='Number of puzzles to generate')
 parser.add_argument('--min', type=int, default=-1,
                     help='Minimum number of pairs')
 parser.add_argument('--max', type=int, default=-1,
@@ -27,7 +29,6 @@ parser.add_argument('--no-colors', action='store_true',
                     help='Print puzzles without colors')
 parser.add_argument('--terminal-only', action='store_true',
                     help='Don\'t show the puzzle in matplotlib')
-args = parser.parse_args()
 
 
 def sign(x):
@@ -220,7 +221,7 @@ def make(w, h, min_numbers=0, max_numbers=100):
 
     debug('Preprocessing...')
     mitm = Mitm(lr_price=2, t_price=1)
-    mitm.prepare(h)
+    mitm.prepare(max(h,10))
     debug('Generating puzzle...')
 
     gtries = 0
@@ -308,7 +309,7 @@ def solution_lines(grid):
                 while not (len(line) >= 2 and tg[line[-1]] == 'x'):
                     for dx, dy in ((-1,0),(1,0),(0,1),(0,-1)):
                         x1, y1 = line[-1][0]+dx, line[-1][1]+dy
-                        if 0 <= x1 < tg.w and 0 <= y1 < tg.w \
+                        if 0 <= x1 < tg.w and 0 <= y1 < tg.h \
                                 and find(uf,(x1,y1)) == r \
                                 and (len(line) == 1 or (x1,y1) != line[-2]):
                             line.append((x1,y1))
@@ -363,43 +364,56 @@ def plot_puzzle(grid, include_solution=False):
 
 
 def debug(s):
-    if args.verbose:
-        print(s, file=sys.stderr)
+    try:
+        if args.verbose:
+            print(s, file=sys.stderr)
+    except NameError:
+        pass
 
 
 def main():
+    global args
+    args = parser.parse_args()
+
     w, h = args.width, args.height
+    if w < 4 or h < 4:
+        print('Please choose width and height at least 4.')
+        return
+
     n = int((w*h)**.5)
     min_numbers = n*2//3 if args.min < 0 else args.min
     max_numbers = n*3//2 if args.max < 0 else args.max
-    grid = make(w, h, min_numbers, max_numbers)
-    color_grid = color_tubes(grid, no_colors=args.no_colors)
 
-    # Print stuff
-    debug(grid)
-    if args.solve:
-        print(color_grid)
+    for _ in range(args.n):
+        grid = make(w, h, min_numbers, max_numbers)
+        color_grid = color_tubes(grid, no_colors=args.no_colors)
 
-    print(w, h)
-    if args.zero:
-        # Print puzzle in 0 format
-        for y in range(color_grid.h):
-            for x in range(color_grid.w):
-                if grid[x,y] in 'v^<>':
-                    print(color_grid[x,y], end=' ')
-                else: print('0', end=' ')
-            print()
-    else:
-        for y in range(color_grid.h):
-            for x in range(color_grid.w):
-                if grid[x,y] in 'v^<>':
-                    print(color_grid[x,y], end='')
-                else: print('.', end='')
-            print()
+        # Print stuff
+        debug(grid)
+        if args.solve:
+            print(color_grid)
 
-    # Draw with pyplot
-    if not args.terminal_only:
-        plot_puzzle(grid, include_solution=args.solve)
+        print(w, h)
+        if args.zero:
+            # Print puzzle in 0 format
+            for y in range(color_grid.h):
+                for x in range(color_grid.w):
+                    if grid[x,y] in 'v^<>':
+                        print(color_grid[x,y], end=' ')
+                    else: print('0', end=' ')
+                print()
+        else:
+            for y in range(color_grid.h):
+                for x in range(color_grid.w):
+                    if grid[x,y] in 'v^<>':
+                        print(color_grid[x,y], end='')
+                    else: print('.', end='')
+                print()
+        print()
+
+        # Draw with pyplot
+        if not args.terminal_only:
+            plot_puzzle(grid, include_solution=args.solve)
 
 
 if __name__ == '__main__':
