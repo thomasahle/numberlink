@@ -216,9 +216,9 @@ History
 -------
 
 Numberlink was written by Thomas Dybdahl Ahle for a competition at Oxford
-University arranged by Michael Spivey (http://spivey.oriel.ox.ac.uk). The
+University arranged by [Michael Spivey](http://spivey.oriel.ox.ac.uk). The
 description of the competition is available at
-http://spivey.oriel.ox.ac.uk/wiki/index.php/Programming_competition_2012
+[spivey.oriel.ox.ac.uk/wiki/index.php/Programming_competition_2012](https://web.archive.org/web/20160416150900/http://spivey.oriel.ox.ac.uk/corner/Programming_competition_2012)
 
 Legal
 -----
