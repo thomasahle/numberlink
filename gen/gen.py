@@ -395,7 +395,7 @@ def main():
     debug('Generating puzzle...')
 
     for _ in range(args.n):
-        grid = make(w, h, mitm, min_numbers, max_numbers, mitm)
+        grid = make(w, h, mitm, min_numbers, max_numbers)
         color_grid = color_tubes(grid, no_colors=args.no_colors)
 
         # Print stuff
