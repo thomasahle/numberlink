@@ -1,7 +1,7 @@
 Numberlink
 ==========
 
-Numberlink is a very fast program for generating and solving large instances of the puzzle [Numberlink / Arukone / Nanbarinku / Flow Free](https://en.wikipedia.org/wiki/Numberlink). Instances of size 40x20 are casually solved and generated, and the complete set of [270 puzzles at Janko.at](https://www.janko.at/Raetsel/Arukone-3/index.htm)
+Numberlink is a very fast program for generating and solving large instances of the puzzle [Numberlink / Arukone / Nanbarinku / Flow Free](https://en.wikipedia.org/wiki/Numberlink). Instances of size 40x40 are casually solved and generated, and the complete set of [270 puzzles at Janko.at](https://www.janko.at/Raetsel/Arukone-3/index.htm)
 is solved in 0.14 seconds(!).
 
 Example generated puzzle:
