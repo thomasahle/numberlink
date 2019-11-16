@@ -8,6 +8,10 @@ import argparse
 from mitm import Mitm
 
 
+# Number of tries at adding loops to the grid before redrawing the side paths.
+LOOP_TRIES = 1000
+
+
 parser = argparse.ArgumentParser(description='Generate Numberlink Puzzles')
 parser.add_argument('width', type=int, default=10,
                     help='Width of the puzzle')
@@ -213,16 +217,13 @@ def has_tripple(tg, uf):
     return False
 
 
-def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
-    """ Creates a grid of size  w x h  without any loops or squares. """
+def make(w, h, mitm, min_numbers=0, max_numbers=1000):
+    """ Creates a grid of size  w x h  without any loops or squares.
+        The mitm table should be genearted outside of make() to give the best performance.
+        """
 
     # Internally we work on a double size grid to handle crossings
     grid = Grid(2*w+1, 2*h+1)
-
-    # The table should be genearted outside of make to give the best performance
-    if not mitm:
-        mitm = Mitm(lr_price=2, t_price=1)
-        mitm.prepare(max(h,10))
 
     gtries = 0
     while True:
@@ -230,7 +231,7 @@ def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
         grid.grid.clear()
 
         # Add left side path
-        path = mitm.rand_path(h, h, 0, -1)
+        path = mitm.rand_path2(h, h, 0, -1)
         if not test_path(grid, path, 0, 0):
             continue
         draw_path(grid, path, 0, 0)
@@ -238,7 +239,7 @@ def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
         grid[0,0], grid[0,2*h] = '\\', '/'
 
         # Add right side path
-        path2 = mitm.rand_path(h, h, 0, -1)
+        path2 = mitm.rand_path2(h, h, 0, -1)
         if not test_path(grid, path2, 2*w, 2*h, 0, -1):
             continue
         draw_path(grid, path2, 2*w, 2*h, 0, -1)
@@ -249,7 +250,7 @@ def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
         # This doesn't make so much sense in terms of normal numberlink tubes.
         tg, _ = make_tubes(grid)
         # Maximum number of tries before retrying main loop
-        for tries in range(1000):
+        for tries in range(LOOP_TRIES):
             x, y = 2*random.randrange(w), 2*random.randrange(h)
 
             # If the square square doen't have an orientation, it's a corner
@@ -278,6 +279,7 @@ def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
 
                 numbers = list(stg.grid.values()).count('x')//2
                 if numbers > max_numbers:
+                    debug('Exceeded maximum number of number pairs.')
                     break
 
                 # Run tests to see if the puzzle is nice
@@ -389,11 +391,11 @@ def main():
     # Using a larger path length in mitm might increase puzzle complexity, but
     # 8 or 10 appears to be the sweet spot if we want small sizes like 4x4 to
     # work.
-    mitm.prepare(max(h,10))
+    mitm.prepare(min(20,max(h,6)))
     debug('Generating puzzle...')
 
     for _ in range(args.n):
-        grid = make(w, h, min_numbers, max_numbers, mitm)
+        grid = make(w, h, mitm, min_numbers, max_numbers, mitm)
         color_grid = color_tubes(grid, no_colors=args.no_colors)
 
         # Print stuff
