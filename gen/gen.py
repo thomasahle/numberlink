@@ -213,16 +213,16 @@ def has_tripple(tg, uf):
     return False
 
 
-def make(w, h, min_numbers=0, max_numbers=100):
+def make(w, h, min_numbers=0, max_numbers=100, mitm=None):
     """ Creates a grid of size  w x h  without any loops or squares. """
 
     # Internally we work on a double size grid to handle crossings
     grid = Grid(2*w+1, 2*h+1)
 
-    debug('Preprocessing...')
-    mitm = Mitm(lr_price=2, t_price=1)
-    mitm.prepare(max(h,10))
-    debug('Generating puzzle...')
+    # The table should be genearted outside of make to give the best performance
+    if not mitm:
+        mitm = Mitm(lr_price=2, t_price=1)
+        mitm.prepare(max(h,15))
 
     gtries = 0
     while True:
@@ -384,8 +384,13 @@ def main():
     min_numbers = n*2//3 if args.min < 0 else args.min
     max_numbers = n*3//2 if args.max < 0 else args.max
 
+    debug('Preprocessing...')
+    mitm = Mitm(lr_price=2, t_price=1)
+    mitm.prepare(max(h,18))
+    debug('Generating puzzle...')
+
     for _ in range(args.n):
-        grid = make(w, h, min_numbers, max_numbers)
+        grid = make(w, h, min_numbers, max_numbers, mitm)
         color_grid = color_tubes(grid, no_colors=args.no_colors)
 
         # Print stuff
