@@ -5,7 +5,7 @@ Numberlink is a very fast program for generating and solving large instances of 
 is solved in 0.14 seconds(!).
 
 Example generated puzzle:
-![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/puzzle.png)
+![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/images/example_0.png)
 
 Running it
 ----------
