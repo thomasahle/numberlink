@@ -82,6 +82,16 @@ def make(w, h, mitm, min_numbers=0, max_numbers=1000):
         the best performance.
         """
 
+    def test_ready(grid):
+        # Test if grid is ready to be returned.
+        sg = grid.shrink()
+        stg, uf = sg.make_tubes()
+        numbers = list(stg.values()).count('x') // 2
+        return min_numbers <= numbers <= max_numbers \
+                and not has_loops(sg, uf) \
+                and not has_pair(stg, uf) \
+                and not has_tripple(stg, uf) \
+
     # Internally we work on a double size grid to handle crossings
     grid = Grid(2 * w + 1, 2 * h + 1)
 
@@ -104,6 +114,10 @@ def make(w, h, mitm, min_numbers=0, max_numbers=1000):
             continue
         grid.draw_path(path2, 2 * w, 2 * h, 0, -1)
         grid[2 * w, 0], grid[2 * w, 2 * h] = '/', '\\'
+
+        # The puzzle might already be ready to return
+        if test_ready(grid):
+            return grid.shrink()
 
         # Add loops in the middle
         # Tube version of full grid, using for tracking orientations.
@@ -129,19 +143,15 @@ def make(w, h, mitm, min_numbers=0, max_numbers=1000):
                 # Add path and recompute orientations
                 grid.draw_path(path, x, y, loop=True)
                 tg, _ = grid.make_tubes()
+
+                # Run tests to see if the puzzle is nice
                 sg = grid.shrink()
                 stg, uf = sg.make_tubes()
-
                 numbers = list(stg.values()).count('x') // 2
                 if numbers > max_numbers:
                     debug('Exceeded maximum number of number pairs.')
                     break
-
-                # Run tests to see if the puzzle is nice
-                if not has_loops(sg, uf) \
-                        and not has_pair(stg, uf) \
-                        and not has_tripple(stg, uf) \
-                        and numbers >= min_numbers:
+                if test_ready(grid):
                     debug(f'Finished in {tries} tries.')
                     debug(f'{numbers} numbers')
                     return sg
