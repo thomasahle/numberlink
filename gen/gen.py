@@ -31,6 +31,8 @@ parser.add_argument('--zero', action='store_true',
                     help='Print puzzle in zero format')
 parser.add_argument('--no-colors', action='store_true',
                     help='Print puzzles without colors')
+parser.add_argument('--no-pipes', action='store_true',
+                    help='When printing solutions, don\'t use pipes')
 parser.add_argument('--terminal-only', action='store_true',
                     help='Don\'t show the puzzle in matplotlib')
 
@@ -166,7 +168,7 @@ def color_tubes(grid, no_colors=False):
             if tube_grid[x,y] == 'x':
                 tube_grid[x,y] = char[find(uf,(x,y))]
             tube_grid[x,y] = col[find(uf,(x,y))] + tube_grid[x,y] + reset
-    return tube_grid
+    return tube_grid, char
 
 
 def add_path(x0, y0, xn, yn, grid, tries=1):
@@ -177,12 +179,14 @@ def add_path(x0, y0, xn, yn, grid, tries=1):
 
 
 def has_loops(grid, uf):
+    """ Check whether the puzzle has loops not attached to an endpoint. """
     groups = len({find(uf, (x,y)) for y in range(grid.h) for x in range(grid.w)})
     ends = sum(bool(grid[x,y] in 'v^<>') for y in range(grid.h) for x in range(grid.w))
     return ends != 2*groups
 
 
 def has_square(grid, uf):
+    """ Check for a 2x2 square of the same color. """
     for y in range(grid.h-1):
         for x in range(grid.w-1):
             if find(uf, (x,y)) == find(uf, (x+1,y)) == find(uf, (x,y+1)) == find(uf, (x+1,y+1)):
@@ -191,6 +195,7 @@ def has_square(grid, uf):
 
 
 def has_pair(tg, uf):
+    """ Check for a pair of endpoints next to each other. """
     for y in range(tg.h):
         for x in range(tg.w):
             for dx,dy in ((1,0), (0,1)):
@@ -202,17 +207,19 @@ def has_pair(tg, uf):
 
 
 def has_tripple(tg, uf):
+    """ Check whether a path has a point with three same-colored neighbours.
+        This would mean a path is touching itself, which is generally not
+        allowed in pseudo-unique puzzles.
+        (Note, this also captures squares.) """
     for y in range(tg.h):
         for x in range(tg.w):
-            if tg[x,y] != 'x':
-                continue
             r = find(uf, (x,y))
             nbs = 0
             for dx, dy in ((1,0), (0,1), (-1,0), (0,-1)):
                 x1, y1 = x + dx, y + dy
                 if 0 <= x1 < tg.w and 0 <= y1 < tg.h and find(uf, (x1,y1)) == r:
                     nbs += 1
-            if nbs >= 2:
+            if nbs >= 3:
                 return True
     return False
 
@@ -283,14 +290,13 @@ def make(w, h, mitm, min_numbers=0, max_numbers=1000):
                     break
 
                 # Run tests to see if the puzzle is nice
-                if not has_square(sg, uf) \
-                        and not has_loops(sg, uf) \
+                if not has_loops(sg, uf) \
                         and not has_pair(stg, uf) \
                         and not has_tripple(stg, uf) \
                         and numbers >= min_numbers:
                     debug(f'Finished in {tries} tries.')
                     debug(f'{numbers} numbers')
-                    return shrink_grid(grid)
+                    return sg
 
         debug(grid)
         debug(f'Gave up after {tries} tries')
@@ -396,12 +402,11 @@ def main():
 
     for _ in range(args.n):
         grid = make(w, h, mitm, min_numbers, max_numbers)
-        color_grid = color_tubes(grid, no_colors=args.no_colors)
+        tube_grrid, uf = make_tubes(grid)
+        color_grid, mapping = color_tubes(grid, no_colors=args.no_colors)
 
         # Print stuff
         debug(grid)
-        if args.solve:
-            print(color_grid)
 
         print(w, h)
         if args.zero:
@@ -420,6 +425,18 @@ def main():
                     else: print('.', end='')
                 print()
         print()
+
+        if args.solve:
+            print('Solution:')
+            if not args.no_pipes:
+                # Translate to proper pipe characters
+                print(repr(color_grid).replace('-','─').replace('|','│'))
+            else:
+                for y in range(grid.h):
+                    for x in range(grid.w):
+                        print(mapping[find(uf,(x,y))], end='')
+                    print()
+            print()
 
         # Draw with pyplot
         if not args.terminal_only:
