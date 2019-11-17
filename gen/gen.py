@@ -98,7 +98,7 @@ def make(w, h, mitm, min_numbers=0, max_numbers=1000):
     gtries = 0
     while True:
         # Previous tries may have drawn stuff on the grid
-        grid.grid.clear()
+        grid.clear()
 
         # Add left side path
         path = mitm.rand_path2(h, h, 0, -1)

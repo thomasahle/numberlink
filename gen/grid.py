@@ -47,6 +47,9 @@ class Grid:
     def __delitem__(self, key):
         del self.grid[key]
 
+    def clear(self):
+        self.grid.clear()
+
     def values(self):
         return self.grid.values()
 
