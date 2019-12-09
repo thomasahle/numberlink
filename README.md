@@ -227,3 +227,4 @@ Numberlink is released under the Affero GPL3.
 
 Read LICENSE for more details.
 
+If you generate puzzles using the scripts and post them in books or use them on your website, put clear reference attrtibuting them to this author.
