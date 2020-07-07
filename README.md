@@ -7,6 +7,8 @@ is solved in 0.14 seconds(!).
 Example generated (and solved) puzzle:
 ![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/images/example_0.png)
 
+You can try out the generated puzzles at [Numberlinks at Puzzle Baron](https://numberlinks.puzzlebaron.com/).
+
 Generating Puzzles
 ------------------
 
