@@ -23,7 +23,7 @@ parser.add_argument('n', type=int, default=1,
 parser.add_argument('--min', type=int, default=-1,
                     help='Minimum number of pairs')
 parser.add_argument('--max', type=int, default=-1,
-                    help='Minimum number of pairs')
+                    help='Maximum number of pairs')
 parser.add_argument('--verbose', action='store_true',
                     help='Print progress information')
 parser.add_argument('--solve', action='store_true',
