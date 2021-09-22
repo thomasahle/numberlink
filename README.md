@@ -8,6 +8,7 @@ Example generated (and solved) puzzle:
 ![Screenshot](https://raw.githubusercontent.com/thomasahle/numberlink/master/images/example_0.png)
 
 You can try out the generated puzzles at [Numberlinks at Puzzle Baron](https://numberlinks.puzzlebaron.com/).
+See also my list of [40x20](https://github.com/thomasahle/numberlink/wiki/Large-Numberlinks) and [50x50 puzzles](https://github.com/thomasahle/numberlink/wiki/Very-Large-Numberlinks).
 
 Generating Puzzles
 ------------------
