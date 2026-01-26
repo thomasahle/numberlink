@@ -37,11 +37,17 @@ See `gen.py --help` for more options.
 Numberlink Solver
 ----------
 
-The Numberlink solver is written in the Go Programming Language and is compiled using
-`$ go install numberlink`. This won't install anything on your system. For more
-information on compiling, see the INSTALL file.
+The Numberlink solver is written in the Go Programming Language. To install:
 
-When you have created the binary, you can run `$ bin/numberlink [options]`.
+    $ go install github.com/thomasahle/numberlink@latest
+
+Or build from source:
+
+    $ git clone https://github.com/thomasahle/numberlink
+    $ cd numberlink
+    $ go build
+
+Then run `$ numberlink [options]` (or `$ ./numberlink` if built locally).
 Numberlink will then read puzzles from standard input in the following format:
 
     5 4
@@ -65,14 +71,14 @@ format below, or as specified by command-line flags:
 
 If the puzzle wasn't solvable, `IMPOSSIBLE` is printed.
 
-To learn about the available command-line flags, see `$ bin/numberlink --help`. 
+To learn about the available command-line flags, see `$ numberlink --help`. 
 
 Old Generator
 -------------
 
 Examples of generating a puzzle and immediately solving it:
 
-    $ bin/numberlink -generate=10x10 | bin/numberlink -tubes
+    $ numberlink -generate=10x10 | numberlink -tubes
     0─────┐120
     3────┐│12│
     ┌──45│└──┘
@@ -86,7 +92,7 @@ Examples of generating a puzzle and immediately solving it:
 
 and larger:
 
-    $ bin/numberlink -generate=20x20 | bin/numberlink -tubes
+    $ numberlink -generate=20x20 | numberlink -tubes
     0────┐┌─┐223┌─4┌───┐
     6───┐│17│┌─┘48┌┘9ab│
     c──c││┌┘││de┌┘│┌┘a││

@@ -1,20 +1,27 @@
-To build and run numberlink, you can execute the following,
-starting in the project root directory:
+To install numberlink directly:
 
-    $ export GOPATH=`pwd`
-    $ go install numberlink # This 'installs' in the bin and pkg folders
-    $ go test numberlink
-    $ bin/numberlink
+    $ go install github.com/thomasahle/numberlink@latest
+
+Or build from source:
+
+    $ git clone https://github.com/thomasahle/numberlink
+    $ cd numberlink
+    $ go build
+    $ ./numberlink
+
+Run tests with:
+
+    $ go test ./...
 
 
-If you don't have Go, you can download it for Linux, FreeBSD,
-OSX or Windows from:
+If you don't have Go, you can download it from:
 
-  https://code.google.com/p/go/downloads/list
+    https://go.dev/dl/
 
-On Ubuntu you may run
+On Ubuntu/Debian:
 
-    $ sudo add-apt-repository ppa:gophers/go
-    $ sudo apt-get update
-    $ sudo apt-get install golang-stable # Or golang-weekly, or golang-tip
+    $ sudo apt-get install golang
 
+On macOS with Homebrew:
+
+    $ brew install go
